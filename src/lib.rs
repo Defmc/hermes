@@ -9,17 +9,17 @@ pub enum BenchSize {
     Time(Duration),
 }
 
-pub struct Bench<T, U> {
+pub struct Bench<'a, T, U> {
     name: String,
     size: BenchSize,
-    test: fn(T) -> U,
-    setup: fn() -> T,
-    post: fn(U),
+    test: &'a dyn Fn(T) -> U,
+    setup: &'a dyn Fn() -> T,
+    post: &'a dyn Fn(U),
     dur: Duration,
     iters: usize,
 }
 
-impl<T, U> fmt::Display for Bench<T, U> {
+impl<'a, T, U> fmt::Display for Bench<'a, T, U> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.name)?;
         f.write_fmt(format_args!(": {:?}", self.dur))?;
@@ -29,15 +29,15 @@ impl<T, U> fmt::Display for Bench<T, U> {
     }
 }
 
-impl<T, U> Bench<T, U> {
+impl<'a, T, U> Bench<'a, T, U> {
     #[must_use]
-    pub fn new(setup: fn() -> T, test: fn(T) -> U) -> Self {
+    pub fn new(setup: &'a impl Fn() -> T, test: &'a impl Fn(T) -> U) -> Bench<'a, T, U> {
         Self {
             name: String::new(),
             size: BenchSize::Iters(1_000),
             setup,
             test,
-            post: |a| std::mem::drop(a),
+            post: &std::mem::drop,
             dur: Duration::ZERO,
             iters: 0,
         }
@@ -56,7 +56,7 @@ impl<T, U> Bench<T, U> {
     }
 
     #[must_use]
-    pub fn post(mut self, post: fn(U)) -> Self {
+    pub fn post(mut self, post: &'a impl Fn(U)) -> Self {
         self.post = post;
         self
     }
@@ -93,9 +93,9 @@ impl<T, U> Bench<T, U> {
     }
 }
 
-impl<U> Bench<(), U> {
+impl<'a, U> Bench<'a, (), U> {
     #[must_use]
-    pub fn no_setup(test: fn(()) -> U) -> Self {
-        Self::new(|| (), test)
+    pub fn no_setup(test: &'a impl Fn(()) -> U) -> Self {
+        Self::new(&|| (), test)
     }
 }

@@ -3,8 +3,7 @@ use std::time::{Duration, Instant};
 use hermes::{Bench, BenchSize};
 
 fn main() {
-    let mut bench = Bench::no_setup(|_| println!("a"))
-        .post(|_| {})
+    let mut bench = Bench::no_setup(&|_| println!("a"))
         .name("foo")
         .size(BenchSize::Time(Duration::from_secs(1)));
     bench.run();
