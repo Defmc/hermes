@@ -1,3 +1,15 @@
+# A simple benchmark suite generator in Rust.
+
+### Features 
+- Iterator-based inputs (via `IterBench`)
+- Setup event (via `ClassicBench`)
+- Post event (to test output)
+- Low latency (~1us)
+
+
+### Usage example
+Like in `benches/samples.rs`
+```rust 
 use hermes::{BenchSize, Bencher, ClassicBench, IterBench};
 use std::{collections::HashSet, time::Duration};
 
@@ -19,13 +31,13 @@ fn main() {
         .flatten()
         .collect();
 
-    let anwsers: HashSet<u64> = iter.iter().map(|(b, e)| pow(*b, *e)).collect();
+    let outputs: HashSet<u64> = iter.iter().map(|(b, e)| pow(*b, *e)).collect();
 
     let inputs = &iter.iter().cycle();
 
     let size = BenchSize::Time(Duration::from_secs(1));
 
-    let assert_exists = |x| assert!(anwsers.contains(&x));
+    let assert_exists = |x| assert!(outputs.contains(&x));
 
     let mut rec_bench =
         IterBench::new(inputs.clone().copied(), &|(b, e): (u64, u32)| rec_pow(b, e))
@@ -50,3 +62,4 @@ fn main() {
     println!("{rec_bench}\n{linear_bench}");
     println!("{empty}");
 }
+```
