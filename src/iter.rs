@@ -1,20 +1,19 @@
+use crate::{Bencher, Logs};
 use core::fmt;
 use std::time::{Duration, Instant};
 
-use crate::{BenchSize, Bencher};
-
+/// An `Iterator`-based benchmarking struct.
+/// Iterates over an iterator to get tests inputs.
+/// It's highly recommended to use an infinity (or cyclic) iterator, once its can't crash.
 #[allow(clippy::module_name_repetitions)]
 pub struct IterBench<'a, I, U>
 where
     I: Iterator,
 {
-    name: String,
-    size: BenchSize,
+    logs: Logs,
     test: &'a dyn Fn(<I as Iterator>::Item) -> U,
     setup: I,
     post: &'a dyn Fn(U),
-    dur: Duration,
-    iters: u32,
 }
 
 impl<'a, I, U> IterBench<'a, I, U>
@@ -24,26 +23,11 @@ where
     #[must_use]
     pub fn new(setup: I, test: &'a dyn Fn(<I as Iterator>::Item) -> U) -> Self {
         Self {
-            name: String::new(),
-            size: BenchSize::Iters(1_000),
+            logs: Logs::default(),
             setup,
             test,
             post: &std::mem::drop,
-            dur: Duration::ZERO,
-            iters: 0,
         }
-    }
-
-    #[must_use]
-    pub fn with_name(mut self, name: impl AsRef<str>) -> Self {
-        self.name = name.as_ref().to_string();
-        self
-    }
-
-    #[must_use]
-    pub const fn with_size(mut self, size: BenchSize) -> Self {
-        self.size = size;
-        self
     }
 
     #[must_use]
@@ -57,30 +41,16 @@ impl<'a, I, U> Bencher for IterBench<'a, I, U>
 where
     I: Iterator,
 {
-    fn iters(&self) -> &u32 {
-        &self.iters
+    fn logs(&self) -> &Logs {
+        &self.logs
     }
 
-    fn iters_mut(&mut self) -> &mut u32 {
-        &mut self.iters
+    fn logs_mut(&mut self) -> &mut Logs {
+        &mut self.logs
     }
 
-    fn elapsed(&self) -> &Duration {
-        &self.dur
-    }
-
-    fn elapsed_mut(&mut self) -> &mut Duration {
-        &mut self.dur
-    }
-
-    fn name(&self) -> &str {
-        &self.name
-    }
-
-    fn size(&self) -> BenchSize {
-        self.size
-    }
-
+    /// # Panics
+    /// When there's no next item on the passed iterator.
     fn step(&mut self) -> Duration {
         let setup = self.setup.next().expect("iterator is not enough");
         let start = Instant::now();

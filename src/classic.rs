@@ -1,45 +1,26 @@
+use crate::{Bencher, Logs};
 use std::{
     fmt,
     time::{Duration, Instant},
 };
 
-use crate::{BenchSize, Bencher};
-
 #[allow(clippy::module_name_repetitions)]
 pub struct ClassicBench<'a, T, U> {
-    name: String,
-    size: BenchSize,
+    logs: Logs,
     test: &'a dyn Fn(T) -> U,
     setup: &'a dyn Fn() -> T,
     post: &'a dyn Fn(U),
-    dur: Duration,
-    iters: u32,
 }
 
 impl<'a, T, U> ClassicBench<'a, T, U> {
     #[must_use]
     pub fn new(setup: &'a dyn Fn() -> T, test: &'a dyn Fn(T) -> U) -> Self {
         Self {
-            name: String::new(),
-            size: BenchSize::Iters(1_000),
+            logs: Logs::default(),
             setup,
             test,
             post: &std::mem::drop,
-            dur: Duration::ZERO,
-            iters: 0,
         }
-    }
-
-    #[must_use]
-    pub fn with_name(mut self, name: impl AsRef<str>) -> Self {
-        self.name = name.as_ref().to_string();
-        self
-    }
-
-    #[must_use]
-    pub const fn with_size(mut self, size: BenchSize) -> Self {
-        self.size = size;
-        self
     }
 
     #[must_use]
@@ -50,28 +31,12 @@ impl<'a, T, U> ClassicBench<'a, T, U> {
 }
 
 impl<'a, T, U> Bencher for ClassicBench<'a, T, U> {
-    fn iters(&self) -> &u32 {
-        &self.iters
+    fn logs(&self) -> &Logs {
+        &self.logs
     }
 
-    fn iters_mut(&mut self) -> &mut u32 {
-        &mut self.iters
-    }
-
-    fn elapsed(&self) -> &Duration {
-        &self.dur
-    }
-
-    fn elapsed_mut(&mut self) -> &mut Duration {
-        &mut self.dur
-    }
-
-    fn name(&self) -> &str {
-        &self.name
-    }
-
-    fn size(&self) -> BenchSize {
-        self.size
+    fn logs_mut(&mut self) -> &mut Logs {
+        &mut self.logs
     }
 
     fn step(&mut self) -> Duration {

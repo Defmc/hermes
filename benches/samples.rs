@@ -22,7 +22,7 @@ fn main() {
 
     let inputs = &iter.iter().cycle();
 
-    let size = BenchSize::Time(Duration::from_secs(3));
+    let size = BenchSize::Time(Duration::from_secs(1));
 
     let mut rec_bench =
         IterBench::new(inputs.clone().copied(), &|(b, e): (u64, u32)| rec_pow(b, e))
