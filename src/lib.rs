@@ -1,5 +1,8 @@
 pub mod bench;
 pub use bench::*;
 
-pub mod suite;
-pub use suite::*;
+pub mod classic;
+pub use classic::*;
+
+pub mod iter;
+pub use iter::*;
