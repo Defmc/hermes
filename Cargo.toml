@@ -2,10 +2,11 @@
 name = "hermes"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+description = "A simple benchmark suite generator in Rust"
+repository = "https://github.com/Defmc/hermes"
+keywords = ["benchmark", "profiling"]
+categories = ["accessibility", "development-tools"]
+license = "MIT"
 
 [[bench]]
 name = "samples"
