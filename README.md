@@ -6,7 +6,6 @@
 - Post event (to test output)
 - Low latency (~1us)
 
-
 ### Usage example
 Like in `benches/samples.rs`
 ```rust 
