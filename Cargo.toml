@@ -1,5 +1,5 @@
 [package]
-name = "hermes"
+name = "hermes_bench"
 version = "0.1.0"
 edition = "2021"
 description = "A simple benchmark suite generator in Rust"
