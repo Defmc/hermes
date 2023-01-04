@@ -45,7 +45,7 @@ pub trait Bencher {
 
     #[must_use]
     fn mean(&self) -> Duration {
-        self.logs().elapsed / self.logs().iters
+        self.logs().elapsed / self.logs().iters.max(1)
     }
 
     #[must_use]
