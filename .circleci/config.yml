@@ -11,19 +11,17 @@ commands:
 
   restore-cache:
     steps:
-      - run: echo "paused by while"
-      # - restore_cache:
-      #     name: Restore sccache cache
-      #     key: sccache-{{ .Environment.CIRCLE_JOB_REPONAME }}-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
+      - restore_cache:
+          name: Restore sccache cache
+          key: sccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "Cargo.lock" }}
 
   save-cache:
     steps:
-      - run: echo "paused by while"
-      # - save_cache:
-      #     name: Save sccache cache
-      #     key: sccache-{{ .Environment.CIRCLE_JOB_REPONAME }}-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ epoch }}
-      #     paths:
-      #       - "~/.cache/sccache"
+      - save_cache:
+          name: Save sccache cache
+          key: sccache-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "Cargo.lock" }}
+          paths:
+            - "~/.cache/sccache"
 
 jobs:
   build-linux:
